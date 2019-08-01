@@ -1,5 +1,9 @@
 package com.test.client;
 
+import com.test.client.handler.LoginResponseHandler;
+import com.test.client.handler.MessageResponseHandler;
+import com.test.codec.PacketDecoder;
+import com.test.codec.PacketEncoder;
 import com.test.protocol.PacketCodec;
 import com.test.protocol.packet.*;
 import com.test.util.LoginUtil;
@@ -37,7 +41,11 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new ClientHandler());
+//                        ch.pipeline().addLast(new ClientHandler());
+                        ch.pipeline().addLast(new PacketDecoder()); //入站事件
+                        ch.pipeline().addLast(new LoginResponseHandler()); //入站事件
+                        ch.pipeline().addLast(new MessageResponseHandler()); //入站事件
+                        ch.pipeline().addLast(new PacketEncoder()); //出站事件
                     }
                 });
 
@@ -74,8 +82,8 @@ public class NettyClient {
                         String line = scanner.nextLine();
                         MessageRequestPacket messageRequestPacket = new MessageRequestPacket();
                         messageRequestPacket.setMessage(line);
-                        ByteBuf buf = new PacketCodec().encode(messageRequestPacket);
-                        channel.writeAndFlush(buf);
+//                        ByteBuf buf = new PacketCodec().encode(messageRequestPacket);
+                        channel.writeAndFlush(messageRequestPacket); //todo 从这里出去的消息先经过 PacketEncode
                     }
                 }
             }

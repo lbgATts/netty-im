@@ -1,7 +1,11 @@
 package com.test.server;
 
+import com.test.codec.PacketDecoder;
+import com.test.codec.PacketEncoder;
 import com.test.protocol.packet.*;
 import com.test.protocol.PacketCodec;
+import com.test.server.handler.LoginRequestHandler;
+import com.test.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,7 +43,11 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() { //channelHandler
                     @Override
                     protected void initChannel(NioSocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new ServerHandler());
+//                        ch.pipeline().addLast(new ServerHandler());
+                        ch.pipeline().addLast(new PacketDecoder());
+                        ch.pipeline().addLast(new LoginRequestHandler());
+                        ch.pipeline().addLast(new MessageRequestHandler());
+                        ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
             bind(serverBootStrap, port);
