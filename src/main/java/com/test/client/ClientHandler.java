@@ -7,6 +7,7 @@ import com.test.protocol.packet.MessageResponsePacket;
 import com.test.protocol.packet.Packet;
 import com.test.util.LoginUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -19,6 +20,9 @@ import java.util.UUID;
  */
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
+
+        private PacketCodec packetCodec = PacketCodec.INSTANCE;
+
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             System.out.println(new Date() + " 客户端开始登录");
@@ -28,8 +32,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             loginRequestPacket.setUsername("flash");
             loginRequestPacket.setPassword("password");
 
-            PacketCodec codec = new PacketCodec();
-            ByteBuf encodedBuf = codec.encode(loginRequestPacket);
+            ByteBuf encodedBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+            encodedBuf = packetCodec.encode(encodedBuf, loginRequestPacket);
             ctx.writeAndFlush(encodedBuf);
         }
 

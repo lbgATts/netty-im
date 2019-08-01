@@ -20,6 +20,8 @@ public class PacketCodec {
     private static final Map<Byte, Class<? extends Packet>> packetTypeMap;
     private static final Map<Byte, Serializer> serializerMap;
 
+    public static PacketCodec INSTANCE = new PacketCodec();
+
     static {
         packetTypeMap = new HashMap<>();
         packetTypeMap.put(Command.LOGIN_REQUEST, LoginRequestPacket.class);  //指令类型，反序列化后的指令class
@@ -35,8 +37,7 @@ public class PacketCodec {
     private static final int MAGIC_NUMBER = 0x12345678;
 
     //编码Packet 让其变成ByteBuf
-    public ByteBuf encode(Packet packet) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.ioBuffer();
+    public ByteBuf encode(ByteBuf buf, Packet packet) {
 
         byte[] bytes = SerializerAlgorithm.DEFAULT.serialize(packet);
 
